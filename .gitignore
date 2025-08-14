@@ -1,0 +1,96 @@
+# ================================
+# Visual Studio + CMake Git Ignore
+# ================================
+
+# --- Visual Studio IDE 캐시/설정 ---
+.vs/
+
+# --- 사용자별 설정 파일 ---
+*.user
+*.userosscache
+*.suo
+*.sdf
+*.opensdf
+*.tlog
+*.ipch
+
+# --- 빌드 산출물 ---
+*.obj
+*.o
+*.lo
+*.slo
+*.pdb
+*.idb
+*.pch
+*.ilk
+*.exe
+*.so
+*.dylib
+*.a
+*.la
+*.lo
+*.d
+*.exp
+
+# --- 로그 / 리포트 ---
+*.log
+*.vspscc
+*.vsp
+*.vsps
+*.tmp
+*.tmp_proj
+*.cache
+*.pid
+*.aps
+*.ncb
+*.opendb
+*.VC.db
+*.VC.VC.opendb
+
+# --- CMake 빌드 디렉터리 ---
+/out/
+/build/
+/CMakeFiles/
+/CMakeCache.txt
+/cmake_install.cmake
+/Testing/
+/compile_commands.json
+/CTestTestfile.cmake
+/Makefile
+
+# --- 빌드 출력 ---
+/bin/
+/lib/
+
+# --- 백업/임시 ---
+*~
+*.bak
+*.swp
+*.swo
+*.orig
+
+# --- OS 특화 ---
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# Linux
+.Trash-*
+
+# --- 기타 ---
+*.tlog
+*.lastbuildstate
+*.idb
+*.db
+*.opendb
+*.VC.db
+*.VC.VC.opendb
