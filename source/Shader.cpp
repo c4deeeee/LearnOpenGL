@@ -42,10 +42,10 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
     unsigned int vertex, fragment;
 
     /**
-        * 버텍스 쉐이더 : 버텍스 데이터를 3D 공간상의 정점 정보로 변환(버텍스 데이터와 MVP 행렬의 행렬 연산을 통해 클립 공간으로 변환)
-        *                버텍스 데이터중 색상, 법선 정보를 프래그먼트 쉐이더로 전달하기도 함
-        *                * MVP : Model(이동, 회전, 크기), View(카메라), Perspective(원근 투영)
-        */
+     * 버텍스 쉐이더 : 버텍스 데이터를 3D 공간상의 정점 정보로 변환(버텍스 데이터와 MVP 행렬의 행렬 연산을 통해 클립 공간으로 변환)
+     *                버텍스 데이터중 색상, 법선 정보를 프래그먼트 쉐이더로 전달하기도 함
+     *                * MVP : Model(이동, 회전, 크기), View(카메라), Perspective(원근 투영)
+     */
 
     vertex = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertex, 1, &vShaderCode, NULL);
@@ -53,9 +53,9 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
     checkCompileErrors(vertex, "VERTEX");
 
     /**
-        * 프래그먼트 쉐이더 : 파이프라인을 거쳐 래스터화 과정에서 스크린 좌표상의 삼각형이 모니터의 어느 픽셀을 덮는지 계산하여 프래그먼트 생성
-        *                   프래그먼트 쉐이더에서는 해당 프래그먼트에 버텍스의 색상 데이터와 광원을 계산해 최종 색상 결정(프래그먼트는 모니터 픽셀에 대응)
-        */
+     * 프래그먼트 쉐이더 : 파이프라인을 거쳐 래스터화 과정에서 스크린 좌표상의 삼각형이 모니터의 어느 픽셀을 덮는지 계산하여 프래그먼트 생성
+     *                   프래그먼트 쉐이더에서는 해당 프래그먼트에 버텍스의 색상 데이터와 광원을 계산해 최종 색상 결정(프래그먼트는 모니터 픽셀에 대응)
+     */
 
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment, 1, &fShaderCode, NULL);
@@ -63,9 +63,9 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath)
     checkCompileErrors(fragment, "FRAGMENT");
 
     /**
-        * 각각의 쉐이더를 컴파일 하면 쉐이더 객체가 생성되며 그것들을 링크해야 함
-        * 링크 과정에서는 각각의 쉐이더의 입출력(in/out) 인터페이스를 체크함(VS에서 out 한 적 없는 데이터를 FS에서 in으로 사용하면 Error)
-        */
+     * 각각의 쉐이더를 컴파일 하면 쉐이더 객체가 생성되며 그것들을 링크해야 함
+     * 링크 과정에서는 각각의 쉐이더의 입출력(in/out) 인터페이스를 체크함(VS에서 out 한 적 없는 데이터를 FS에서 in으로 사용하면 Error)
+     */
 
     id = glCreateProgram();
     glAttachShader(id, vertex);

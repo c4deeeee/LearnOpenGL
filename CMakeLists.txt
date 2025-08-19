@@ -12,8 +12,9 @@ endif()
 
 # --- 경로 설정 ---
 set(ROOT_DIR ${CMAKE_SOURCE_DIR})
-set(SRC_DIR  ${ROOT_DIR}/source)     # ← 'sourece'가 아니라 'source' 경로 사용
+set(SRC_DIR  ${ROOT_DIR}/source)
 set(LIB_DIR  ${ROOT_DIR}/library)
+set(RESC_DIR ${ROOT_DIR}/resource) 
 
 # --- vcpkg 통합 제거 ---
 set(VCPKG_APPLOCAL_DEPS OFF CACHE BOOL "Disable vcpkg applocal" FORCE)
@@ -50,6 +51,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${SRC_DIR}
     ${LIB_DIR}/glad/include
     ${LIB_DIR}/glfw-3.4/include
+    ${LIB_DIR}/stb_image/include
 )
 
 # --- 링킹 ---
@@ -63,6 +65,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 # source/GLSL -> (빌드폴더)/bin/GLSL 로 복사
 set(SHADER_SRC_DIR "${SRC_DIR}/GLSL")
 set(SHADER_DST_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/GLSL")
+set(TEXTURE_SRC_DIR "${RESC_DIR}")
+set(TEXTURE_DST_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/texture")
 
 # 개별 파일 지정 (요청: vertex.glsl, fragment.glsl)
 set(SHADER_FILES
@@ -77,7 +81,11 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             "${SHADER_SRC_DIR}/vertex.glsl"   "${SHADER_DST_DIR}/vertex.glsl"
     COMMAND "${CMAKE_COMMAND}" -E copy_if_different
             "${SHADER_SRC_DIR}/fragment.glsl" "${SHADER_DST_DIR}/fragment.glsl"
-    COMMENT "Copying GLSL shaders to ${SHADER_DST_DIR}"
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${TEXTURE_DST_DIR}"
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+            "${TEXTURE_SRC_DIR}/container.jpg"   "${TEXTURE_DST_DIR}/container.jpg"
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+            "${TEXTURE_SRC_DIR}/awesomeface.png"   "${TEXTURE_DST_DIR}/awesomeface.png"
 )
 
 # --- 경고 수준/최적화(선택) ---
