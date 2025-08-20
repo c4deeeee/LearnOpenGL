@@ -52,6 +52,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${LIB_DIR}/glad/include
     ${LIB_DIR}/glfw-3.4/include
     ${LIB_DIR}/stb_image/include
+    ${LIB_DIR}/glm-1.0.1-light
 )
 
 # --- 링킹 ---

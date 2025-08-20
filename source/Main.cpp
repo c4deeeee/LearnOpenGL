@@ -2,6 +2,9 @@
 #include <Shader.h>
 
 #include "stb_image.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
 
@@ -14,11 +17,11 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 float vertices[] = {
-    // positions          // colors           // texture coords
-     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+    // positions          // texture coords
+     0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // top right
+     0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // bottom right
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // bottom left
+    -0.5f,  0.5f, 0.0f,   0.0f, 1.0f  // top left 
 };
 
 unsigned int indices[] = 
@@ -147,7 +150,17 @@ int main()
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
 
+        // 변환 행렬 생성
+        glm::mat4 transform = glm::mat4(1.0f);
+        transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0f));
+        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        // 유니폼으로 변환 행렬 전달
         shader->use();
+        unsigned int transformLoc = glGetUniformLocation(shader->id, "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+
+        // 드로우 콜
         glBindVertexArray(VAO);
         //glDrawArrays(GL_TRIANGLES, 0, 3);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // 인덱스 버퍼용
@@ -156,6 +169,8 @@ int main()
         glfwPollEvents();
         glfwSwapBuffers(window);
     }
+
+    shutDown();
 }
 
 bool initBeforeOfLoop()
@@ -260,16 +275,16 @@ bool generatedBuffer()
      */
 
     // 버텍스 좌표 속성
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), static_cast<void*>(0));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), static_cast<void*>(0));
     glEnableVertexAttribArray(0);
 
     // 버텍스 색상 속성
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    /*glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);*/
 
     // 버텍스 UV맵 속성
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0); // VBO 정보가 이미 VAO에 저장되어 있기 때문에 버텍스 버퍼를 언바인드 해도 무관함
     glBindVertexArray(0); // 버텍스 어레이는 glDeleteVertexArrays()로 제거하기 전까지 유지되므로 바인딩 해체후 나중에 메인 루프에서 변수 VAO로 리바인딩

@@ -4,7 +4,7 @@
 out vec4 FragColor;
 
 // 버텍스 쉐이더에서 out vec3 ourColor;로 출력한 데이터를 전달받아 사용
-in vec3 ourColor;
+// in vec3 ourColor;
 
 // 래스터라이저 단계에서 프래그먼트 좌표와 보간되어 해당 프래그먼트가 이미지상에서 보간된 좌표로 받음
 in vec2 TexCoord;
