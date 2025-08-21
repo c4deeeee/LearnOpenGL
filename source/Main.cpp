@@ -17,17 +17,66 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 float vertices[] = {
-    // positions          // texture coords
-     0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // top right
-     0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // bottom right
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // bottom left
-    -0.5f,  0.5f, 0.0f,   0.0f, 1.0f  // top left 
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
 
-unsigned int indices[] = 
-{
-    0, 1, 3,  // 우상단, 우하단, 좌상단 버텍스
-    1, 2, 3   // 우하단, 좌하단, 좌상단 버텍스
+//unsigned int indices[] = 
+//{
+//    0, 1, 3,
+//    1, 2, 3
+//};
+
+glm::vec3 cubePositions[] = {
+      glm::vec3(0.0f,  0.0f,  0.0f),
+      glm::vec3(2.0f,  5.0f, -15.0f),
+      glm::vec3(-1.5f, -2.2f, -2.5f),
+      glm::vec3(-3.8f, -2.0f, -12.3f),
+      glm::vec3(2.4f, -0.4f, -3.5f),
+      glm::vec3(-1.7f,  3.0f, -7.5f),
+      glm::vec3(1.3f, -2.0f, -2.5f),
+      glm::vec3(1.5f,  2.0f, -2.5f),
+      glm::vec3(1.5f,  0.2f, -1.5f),
+      glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
 int main() 
@@ -124,50 +173,103 @@ int main()
     glUniform1i(glGetUniformLocation(shader->id, "texture1"), 0); // 유니폼 설정
     shader->setInt("texture2", 1); // 쉐이더 클래스에서 미리 유니폼 설정 함수를 정의했으므로 그것 이용
 
-    /**
-     * 메인 루프
-     * 별도의 종료 시그널이 발생하기 전까지 계속 렌더링이 되어야 함
-     * glfwSwapBuffers() : OpenGL은 두개의 버퍼를 사용해 화면에 렌더링 하는데, 첫번째 버퍼는 완성된 화면을 출력하는 버퍼
-     *                     두번째 버퍼는 다음 화면에 렌더링할 픽셀을 만드는 버퍼이며 두번째 버퍼가 완성되면 첫번째 버퍼와 스왑하여 렌더링
-     *                     Double Buffer 방식이라고 하며 이 함수는 버퍼를 스왑하는 함수
-     * glfwPollEvents() : 키보드, 마우스 입력을 감지하면 입력에 따른 콜백함수를 호출하는 함수
-     * glClearColor() : 버퍼 클리어 색상(R, G, B, A) 설정 함수
-     * glClear() : 버퍼를 클리어 해주지 않으면 이전 버퍼에서 생성된 프레임이 계속 출력됨, 설정한 RGBA 값으로 버퍼를 클리어 해주는 함수
-     */
-
+    // 메인 루프
     while (!glfwWindowShouldClose(window))
     {
         // 입력 처리
         processInput(window);
 
-        // 렌더링
+        /**
+         * 버퍼 클리어
+         * OpenGL은 두 개의 버퍼로 화면 출력과 다음 프레임 생성을 반복함(glfwSwapBuffers() 함수 설명에서 후술)
+         * 지금 프레임의 픽셀들이 모니터 화면에 이미 출력되어 있는 상태로 버퍼가 스왑되면 이전에 출력되었던 픽셀들이 여전히 모니터에 출력되고 있어
+         * 새로 그려지는 프레임의 픽셀을 그릴 때 이전 픽셀 위를 덮어 씌우므로 부자연 스러운 느낌을 줌, 다음 프레임 출력 직전 미리 설정한 배경색으로
+         * 버퍼를 클리어 하여 그런 현상을 없애줄 수 있음
+         * 
+         * 깊이 버퍼의 경우 깊이 테스트에서 사용되며 프레임 마다 깊이 버퍼가 달라질 수 있으므로 초기화 필요
+         */
+
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // 텍스쳐 바인딩
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
+        
+        /**
+         * 뷰(view), 투영(projection) 행렬 생성
+         * 3D에 대한 표현은 2D보다 좀 더 많은 공간 변형을 거쳐감, 이 거쳐가는 공간들은 로컬, 월드, 뷰, 클립, NDC, 스크린 총 5개로 구성됨
+         * 
+         * 로컬 공간 : 각 오브젝트가 중심이 되는 공간으로 공간의 원점(0, 0, 0) 이 물체 한 가운데 존재함
+         * 
+         * 월드 공간 : 로컬 공간에 모델 행렬을 곱하여 구할 수 있는 공간으로 모델 행렬은 월드의 다른 오브젝트에 비해 상대적으로 얼마나 크고 작은지(크기, Scale),
+         *            어떤 축을 기준으로 몇 도 기울어져 있는지(회전, Rotation), 월드의 원점으로 부터 얼마나 떨어져 있는지(이동)로 구성되어 있음
+         *            Model = Translate * Rotate * Scale(OpenGL에서 행렬간 곱셈은 오른쪽에서 왼쪽으로 수행, 행렬곱은 교환법칙이 성립하지 않으므로 주의)
+         * 
+         * 뷰 공간 : 월드 공간에서 뷰 행렬을 곱하여 구할 수 있는 공간으로 뷰 행렬은 관찰자 즉 카메라의 시점을 반영함(카메라 시스템 추가 후 디테일한 설명 추가)
+         * 
+         * 클립 공간 : 뷰 공간에서 투영 행렬을 곱하여 구할 수 있는 공간으로 투영 행렬은 직교 투영(Orthographic)과 원근 투영(Perspective)으로 구분됨
+         *            직교 투영은 카메라로 부터 버텍스가 멀리 있어도 원근을 표현하지 않아 현실적인 3D 표현에서는 사용되지 않고 일부 3D 툴이나 탑뷰 게임에서 사용
+         *            원근 투영은 원근을 표현하는 행렬로 카메라로 부터 먼 물체일수록 작게 표현되고 원근 왜곡이 발생
+         *            투영 행렬을 구성하기 위해서는 카메라의 중심으로 부터 좌, 우, 위, 아래 이등변 삼각형에서 꼭지각의 크기인 시야각(Field of View, FOV)
+         *            화면의 너비를 높이로 나눈 종횡비, 카메라와 가까운 근평면, 먼 원평면의 깊이가 필요함
+         *            그중에서 근평면, 원평면과 좌, 우, 위, 아래 4개의 평면을 합쳐 하나의 입체 도형으로 만들면 절두체(Frustum)라고 하며, 이 절두체 바깥에 존재하는
+         *            삼각형은 OpenGL에서 렌더링 되지 않음(Frustum Culling), 만약 삼각형이 절두체 면에 걸쳐 있다면 절두체 안에 있는 면에서 삼각형을 재구성
+         * 
+         * NDC : Normalized Device Coordinates(정규화된 장치 좌표)로 범위가 x, y, z -1.0 ~ 1.0 사이로 이루어진 좌표계
+         *       클립 공간(x, y, z, w)의 x, y, z 속성을 각각 네 번째 속성인 w로 나누면(원근 분할) 버텍스의 좌표가 NDC 좌표 내에 속하도록 변형됨
+         *       
+         * 스크린 공간 : NDC에서 뷰포트의 크기(glViewPort로 설정)를 이용해 해당 버텍스가 뷰포트 내의 어떤 픽셀에 출력될지 결정하는 뷰포트 변환 수행하여
+         *              프래그먼트로 변환
+         * 
+         * 이 모든 공간 변형은 렌더링 파이프라인에서 버텍스 쉐이더와 래스터라이저 사이에 수행되며 클립 공간까지의 생성은 버텍스 쉐이더에서 수행하는데
+         * 로컬 -> 월드 변환에서와 같이 Clip = Projection * View * Model * Local 순서대로 곱하여야 함, 버텍스 쉐이더에서 클립 공간을 생성하면
+         * 이후 단계에서 원근 분할을 통해 NDC 좌표 생성, 뷰포트 변환을 통해 스크린 공간을 생성
+         */
 
-        // 변환 행렬 생성
-        glm::mat4 transform = glm::mat4(1.0f);
-        transform = glm::translate(transform, glm::vec3(0.0f, 0.0f, 0.0f));
-        transform = glm::rotate(transform, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        glm::mat4 view = glm::mat4(1.0f);
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 
-        // 유니폼으로 변환 행렬 전달
+        glm::mat4 projection = glm::mat4(1.0f);
+        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        
         shader->use();
-        unsigned int transformLoc = glGetUniformLocation(shader->id, "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(transform));
+        shader->setMat4("projection", projection);
+        shader->setMat4("view", view);
 
-        // 드로우 콜
         glBindVertexArray(VAO);
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // 인덱스 버퍼용
 
-        // 입력 감지 및 버퍼 스왑
-        glfwPollEvents();
+        /**
+         * 모델 행렬 생성
+         * 뷰, 투영 행렬의 경우 하나의 행렬을 계속 사용하여도 무방하지만(뷰 행렬의 경우 다수의 카메라 시점을 표현하고 싶을 경우 행렬을 여러개 구성)
+         * 모델 행렬의 경우 저마다 위치와 크기, 바라보는 방향이 다르기 때문에 모든 오브젝트에 개별적으로 존재해야 함
+         */
+
+        for (unsigned int i = 0; i < 10; i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * i;
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f)); // 곱하고자 하는 행렬, 회전각, 회전축
+            shader->setMat4("model", model);
+
+            glDrawArrays(GL_TRIANGLES, 0, 36); // 드로우 콜
+        }
+
+        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); // 인덱스 버퍼용
+
+        /**
+         * 버퍼 스왑
+         * 더블 버퍼(double buffer)는 프론트, 백 두 개의 버퍼를 사용해 화면 출력과 다음 프레임 생성을 반복하고
+         * 프론트 버퍼에서 프레임을 모두 모니터에 출력했으면 다음 프레임 생성을 위해 백 버퍼로 역할을 바꾸고
+         * 이전 프레임을 출력하는 동안 백 버퍼에서 다음 프레임에 대한 생성을 마치면 프론트 버퍼로 역할을 바꿈
+         * glfwSwapBuffers()는 버퍼 스왑을 지시하는 함수
+         */
+
         glfwSwapBuffers(window);
+        glfwPollEvents(); // 입력 감지
     }
 
     shutDown();
@@ -188,14 +290,17 @@ bool generatedContext()
     /**
      * GLFW을 초기화하여 OpenGL 버전, 프로필을 설정함
      * 아래는 OpenGL 3.3 Core Profile을 사용함을 설정한 것
-     * glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE) Mac OS 에서 설정해줘야 하는 설정
+     * 실행환경이 MacOS일 경우 다음 구문 추가 glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE)
      */
 
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
+#ifdef __APPLE__
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
 
     /**
      * GLFW는 윈도우 창 생성을 도와주는 라이브러리
@@ -224,6 +329,15 @@ bool generatedContext()
     }
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // 콜백 framebuffer_size_callback()을 컨텍스트에 등록
+
+    /**
+     * 깊이 테스트
+     * 정육면체를 렌더링 하고자 할 때 투영 행렬이 적용될 경우 보고있는 시점을 기준으로 가까운 평면과 먼 평면이 존재함
+     * 만약 깊이 테스트를 활성화 하지 않고 렌더링 하면 OpenGL 에서는 각 평면의 렌더링 순서를 보장하지 않기 때문에 가장 앞 평면을 먼저 렌더링 하고
+     * 그 다음 가장 뒤에있는 평면을 렌더링 할 경우 앞면을 뒷면이 덮어 씌워버림, 정확한 렌더링을 위해서는 각 점들의 깊이값을 통해 뒤에 있는 점의 경우
+     * 렌더링 하지 않도록 깊이 테스트를 활성화 해야함(기본값은 비활성화)
+     */
+    glEnable(GL_DEPTH_TEST);
 
     return true;
 }
@@ -263,9 +377,9 @@ bool generatedBuffer()
      * 등록 과정은 버퍼 종류가 GL_ELEMENT_ARRAY_BUFFER인 것을 제외하면 버텍스 버퍼와 동일함
      */
 
-    glGenBuffers(1, &EBO);
+    /*glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);*/
 
     /**
      * 버텍스 어레이 속성 등록
@@ -278,10 +392,6 @@ bool generatedBuffer()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), static_cast<void*>(0));
     glEnableVertexAttribArray(0);
 
-    // 버텍스 색상 속성
-    /*glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);*/
-
     // 버텍스 UV맵 속성
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
@@ -289,11 +399,8 @@ bool generatedBuffer()
     glBindBuffer(GL_ARRAY_BUFFER, 0); // VBO 정보가 이미 VAO에 저장되어 있기 때문에 버텍스 버퍼를 언바인드 해도 무관함
     glBindVertexArray(0); // 버텍스 어레이는 glDeleteVertexArrays()로 제거하기 전까지 유지되므로 바인딩 해체후 나중에 메인 루프에서 변수 VAO로 리바인딩
 
-    /**
-     * 버퍼가 정상적으로 생성되었을 경우 버퍼 ID가 할당되며, 실패할 경우 버퍼 ID가 0
-     */
-
-    if (VAO && VBO && EBO)
+    // 버퍼가 정상적으로 생성되었을 경우 버퍼 ID가 할당되며, 실패할 경우 버퍼 ID가 0
+    if (VAO && VBO/* && EBO*/)
         return true;
     return false;
 }

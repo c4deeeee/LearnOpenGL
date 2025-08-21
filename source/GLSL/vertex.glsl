@@ -11,10 +11,12 @@ layout (location = 1) in vec2 aTexCoord;
 // 텍스쳐 좌표는 래스터라이저 단계에서 프래그먼트 좌표와 보간하여 프래그먼트 쉐이더로 전달
 out vec2 TexCoord;
 
-uniform mat4 transform;
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
 
 void main()
 {
-    gl_Position = transform * vec4(aPos, 1.0f);
-    TexCoord = vec2(aTexCoord.x, aTexCoord.y);
+    gl_Position = projection * view * model * vec4(aPos, 1.0f);
+    TexCoord = vec2(aTexCoord.x, 1.0 - aTexCoord.y);
 }
