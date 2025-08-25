@@ -1,20 +1,36 @@
-﻿#include <Main.h>
-#include <Shader.h>
+﻿#include "Main.h"
+#include "Shader.h"
+#include "Camera.h"
 
 #include "stb_image.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 #include <iostream>
 
+/**
+ * TO DO
+ * 1. Camera.cpp에 각 함수 구현에 대한 설명주석 달기
+ * 2. mouse_callback 함수 및 설명 누락된 곳에 설명주석 달기
+ */
+
 GLFWwindow* window = nullptr;
 Shader* shader = nullptr;
+Camera* camera = nullptr;
+
 unsigned int shaderProgram;
 unsigned int VBO, VAO, EBO;
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
+
+float lastX = SCR_WIDTH / 2.0f;
+float lastY = SCR_HEIGHT / 2.0f;
+bool firstMouse = true;
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
 float vertices[] = {
     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -87,6 +103,7 @@ int main()
 
     // 쉐이더 컴파일 및 링크
     shader = new Shader("GLSL/vertex.glsl", "GLSL/fragment.glsl");
+    camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
     /**
      * 텍스쳐 생성
@@ -176,6 +193,14 @@ int main()
     // 메인 루프
     while (!glfwWindowShouldClose(window))
     {
+        /**
+         * 델타 시간
+         * 
+         */
+        float currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         // 입력 처리
         processInput(window);
 
@@ -229,11 +254,8 @@ int main()
          * 이후 단계에서 원근 분할을 통해 NDC 좌표 생성, 뷰포트 변환을 통해 스크린 공간을 생성
          */
 
-        glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-
-        glm::mat4 projection = glm::mat4(1.0f);
-        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 view = camera->GetViewMatrix();
+        glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         
         shader->use();
         shader->setMat4("projection", projection);
@@ -315,6 +337,11 @@ bool generatedContext()
         return false;
     }
     glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // 콜백 framebuffer_size_callback()을 컨텍스트에 등록
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // 마우스 커서 제거
 
     /**
      * GLAD는 OpenGL 함수 로더 라이브러리
@@ -327,8 +354,6 @@ bool generatedContext()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return false;
     }
-
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // 콜백 framebuffer_size_callback()을 컨텍스트에 등록
 
     /**
      * 깊이 테스트
@@ -414,6 +439,7 @@ void shutDown()
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
     delete shader;
+    delete camera;
     glfwTerminate();
 }
 
@@ -424,6 +450,15 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) // ESC
         glfwSetWindowShouldClose(window, true);
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera->ProcessKeyboard(FORWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera->ProcessKeyboard(BACKWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera->ProcessKeyboard(LEFT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera->ProcessKeyboard(RIGHT, deltaTime);
 }
 
 /**
@@ -434,4 +469,33 @@ void processInput(GLFWwindow* window)
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+}
+
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    /**
+     * 설명추가 필요함
+     */
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos;
+
+    lastX = xpos;
+    lastY = ypos;
+
+    camera->ProcessMouseMovement(xoffset, yoffset);
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    camera->ProcessMouseScroll(static_cast<float>(yoffset));
 }
